@@ -93,11 +93,11 @@ def get_guard_sleep_totals(sleeps):
 def get_sleep_stats(sleep):
     assert isinstance(sleep, list)
 
-    most_slept = sorted(sleep, reverse=True)[0]
+    most_slept = max(sleep)
     most_slept_minute = sleep.index(most_slept)
     total_sleep = sum(sleep)
 
-    return (total_sleep, most_slept_minute)
+    return (total_sleep, most_slept_minute, most_slept)
 
 
 def get_guard_stats(guard_totals):
@@ -108,8 +108,13 @@ def get_guard_stats(guard_totals):
 
 
 def get_most_sleeper(guard_stats):
-    kv_stats_sleep_total = lambda x: x[1][0]
-    return sorted(guard_stats, key=kv_stats_sleep_total, reverse=True)[0]
+    get_sleep_total = lambda x: x[1][0]
+    return max(guard_stats, key=get_sleep_total)
+
+
+def get_most_frequent_sleeper(guard_stats):
+    get_most_slept = lambda x: x[1][2]
+    return max(guard_stats, key=get_most_slept)
 
 
 sleeps = get_sleeps(events)
@@ -120,6 +125,12 @@ guard_stats = get_guard_stats(guard_sleep_totals)
 
 most_sleeper = get_most_sleeper(guard_stats)
 
-solution = kv_guard_id(most_sleeper) * most_sleeper[1][1]
+solution_task1 = kv_guard_id(most_sleeper) * most_sleeper[1][1]
 
-print("solution:", solution)
+print("solution task1:", solution_task1)
+
+most_frequent_sleeper = get_most_frequent_sleeper(guard_stats)
+
+solution_task2 = kv_guard_id(most_frequent_sleeper) * most_frequent_sleeper[1][1]
+
+print("solution task2:", solution_task2)
