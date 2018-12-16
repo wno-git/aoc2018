@@ -1,38 +1,49 @@
 #!/usr/bin/env python3
 
+import string
+from operator import itemgetter
+
+
 with open("input5.txt") as f:
     polymer = next(f).rstrip()
 
 
-# This is O(n^2) and very slow. New lists are created on every iteration
-# requiring a O(n) memory copy.
-# There is probably a much better way...
+def remove_unit(polymer, unit):
+    return [ u for u in polymer if u.lower() != unit ]
 
-def remove_reaction(polymer):
-    assert len(polymer) > 1
 
-    for i in range(0, len(polymer) - 1):
-        a = polymer[i]
-        b = polymer[i + 1]
+def remove_reactions(polymer):
+    stack = []
 
-        if a == b:
-            # no reaction
+    for right in polymer:
+        if not stack:
+            stack.append(right)
             continue
 
-        if a.lower() == b.lower():
-            # opposite polarities, reaction
-            return polymer[:i] + polymer[i + 2:]
+        left = stack[-1]
 
-    return polymer
+        if left.lower() != right.lower() or left == right:
+            stack.append(right)
+            continue
 
+        stack.pop()
 
-while True:
-    p = remove_reaction(polymer)
-    if p == polymer:
-        # no more reactions
-        break
-
-    polymer = p
+    return stack
 
 
-print("solution:", len(polymer))
+def find_shortest_polymer(polymer):
+    polymers = [
+        (unit, len(remove_reactions(remove_unit(polymer, unit))))
+            for unit in string.ascii_lowercase
+    ]
+
+    return min(polymers, key=itemgetter(1))[1]
+
+
+polymer_1 = remove_reactions(polymer)
+
+print("solution 1:", len(polymer_1))
+
+polymer_2 = find_shortest_polymer(polymer)
+
+print("solution 2:", polymer_2)
